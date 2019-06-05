@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.preference.PreferenceManager;
@@ -165,6 +166,7 @@ public class MainActivity extends AppCompatActivity
         game = new Game(timeLimit, numDigits, gameDuration);
         gameTimeElapsed = 0;
         complete = false;
+        Toast.makeText(this, R.string.reset_message, Toast.LENGTH_LONG).show();
         pauseGame();
         break;
       case R.id.play:
@@ -178,9 +180,7 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
         break;
       case R.id.status:
-        intent = new Intent(this, StatusActivity.class);
-        intent.putExtra(getString(R.string.game_data_key), game);
-        startActivity(intent);
+        showStats();
         break;
       default:
         handled = super.onOptionsItemSelected(item);
@@ -188,6 +188,12 @@ public class MainActivity extends AppCompatActivity
 
     }
     return handled;
+  }
+
+  private void showStats() {
+    Intent intent= new Intent(this, StatusActivity.class);
+    intent.putExtra(getString(R.string.game_data_key), game);
+    startActivity(intent);
   }
 
   /**
@@ -355,7 +361,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void run() {
       complete = true;
-      runOnUiThread(() -> pauseGame());
+      runOnUiThread(() -> {
+        pauseGame();
+        Toast.makeText(MainActivity.this, "Time's up!", Toast.LENGTH_LONG).show();
+        showStats();
+      });
     }
 
   }
